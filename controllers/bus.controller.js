@@ -1,5 +1,5 @@
 import { Op } from "sequelize";
-import Buses from "../models/bus.model.js";
+import {Buses, Bookings, Users} from "../models/index.model.js";
 
 
 export const insertBus = async (req, res) => {
@@ -8,7 +8,7 @@ export const insertBus = async (req, res) => {
         if (!busNumber || !totalSeats || !availableSeats) {
             return res.status(400).json({ "msg": "Some fields are missing" });
         }
-        const bus = Buses.create({
+        const bus = await Buses.create({
             busNumber: busNumber,
             totalSeats: totalSeats,
             availableSeats: availableSeats
@@ -48,6 +48,23 @@ export const busesWithAvailableSeat = async (req, res) => {
     } catch (error) {
         console.error("Select error:", error);
         return res.status(500).json({ msg: "Error occurred while fetching buses with available seats" });
+    }
+}
+
+export const getUserDetailsWithBooking = async(req,res) => {
+    try {
+        const bookings = await Bookings.findAll({
+            where: { BusId: req.params.id },
+            include: {
+              model: Users,
+              attributes: ["name", "email"]
+            }
+          });
+
+          return res.status(200).json({bookings});
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ msg: "Error occurred while fetching data" });
     }
 }
 

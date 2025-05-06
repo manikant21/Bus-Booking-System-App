@@ -1,4 +1,4 @@
-import Users from "../models/user.model.js";
+import {Users, Bookings, Buses} from "../models/index.model.js";
 
 
 export const insertUser = async(req, res) => {
@@ -26,6 +26,23 @@ export const getUsersDetail = async (req, res) => {
     } catch (error) {
         console.error("Select error:", error);
         return res.status(500).json({ msg: "Error occurred while fetching users" });
+    }
+}
+
+export const getBusDetailsWithBooking = async (req,res) => {
+    try {
+        const bookings = await Bookings.findAll({
+            where: { UserId: req.params.id },
+            include: {
+              model: Buses,
+              attributes: ["busNumber"]
+            }
+          });
+
+          return res.status(200).json({bookings});
+    } catch (error) {
+        console.error("Select error:", error);
+        return res.status(500).json({ msg: "Error occurred while fetching data" });
     }
 }
 
